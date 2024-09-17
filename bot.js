@@ -38,6 +38,7 @@ async function send_message(env, message, disable_notification) {
   const data = {
     chat_id: env.CHAT_ID,
     text: message,
+    parse_mode: 'MarkdownV2',
     disable_notification: disable_notification,
   }
   const response = await fetch(url, {
@@ -48,9 +49,14 @@ async function send_message(env, message, disable_notification) {
     },
     body: JSON.stringify(data),
   })
+  console.log(data)
   if (!response.ok) {
     throw new Error(`send_message: server returns ${response.status} ${response.statusText}`)
   }
+}
+
+function escape(text) {
+  return text.toString().replace(/(\_|\*|\[|\]|\(|\)|\~|\`|\>|\#|\+|\-|\=|\||\{|\}|\.|\!)/g, '\\$1')
 }
 
 async function process_new_phase(env, type, phase) {
@@ -58,8 +64,16 @@ async function process_new_phase(env, type, phase) {
   const weapons = phase.weapons
   const disable_notification = type === 'Normal' && !weapons.includes(-2)
 
-  const suffix = 'Check https://splatoon.oatmealdome.me/three/salmon-run';
-  const message = `New ${type} phase with weapons ${weapons}\n${suffix}`
+  const suffix = escape('Check https://splatoon.oatmealdome.me/three/salmon-run')
+  let img = ''
+  if (weapons.includes(-1)) {
+    img = ` \\[[img](https://splatoon.oatmealdome.me/img/weapon/main/thunder/Coop_Random.webp)\\]`
+  } else if (weapons.includes(-2)) {
+    img = ` \\[[img](https://splatoon.oatmealdome.me/img/weapon/main/blitz/Coop_Random_Gold.webp)\\]`
+  }
+  const message = `New *${type}* phase with weapons ${escape(weapons)}${img}
+from \`${phase.startTime}\` to \`${phase.endTime}\`
+${suffix}`
 
   if (type !== 'Normal' || weapons.includes(-1) || weapons.includes(-2)) {
     await send_message(env, message, disable_notification)
