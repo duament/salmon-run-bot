@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 async function load_prev_ids(env) {
   const prev_ids = await env.SALMON_RUN.get('prev_ids', 'json')
   if (Array.isArray(prev_ids)) {
