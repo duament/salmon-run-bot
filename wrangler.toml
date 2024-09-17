@@ -1,0 +1,13 @@
+name = "salmon-run-bot"
+main = "bot.js"
+compatibility_date = "2024-08-06"
+
+kv_namespaces = [
+    { binding = "SALMON_RUN", id = "0c368b99001c44ccbde5fca6ace0e9b7" }
+]
+
+[triggers]
+crons = ["*/10 2-15 * * *"]
+
+[vars]
+CHAT_ID = "@salmon_run"
